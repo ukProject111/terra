@@ -1,0 +1,10 @@
+# root-level requirements — covers data pipeline and training
+pandas==3.0.1
+numpy==2.4.3
+scikit-learn==1.8.0
+scipy==1.17.1
+joblib==1.5.3
+matplotlib==3.10.3
+seaborn==0.13.2
+jupyter==1.1.1
+xgboost==3.0.2
