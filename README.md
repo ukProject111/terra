@@ -1,5 +1,7 @@
 # UK Regional Insight Web App
 
+**Live Demo:** [terrasight-iota.vercel.app](https://terrasight-iota.vercel.app/)
+
 TerraSight is a full-stack web application that forecasts key socioeconomic indicators across 9 English regions from 2025 to 2035. It leverages machine learning models trained on publicly available UK government data to generate predictions with confidence intervals and plain-English insights.
 
 ### What It Predicts
