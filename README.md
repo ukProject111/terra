@@ -6,6 +6,101 @@ open government data.
 
 Built with FastAPI (Python) on the backend and React + TypeScript on the frontend.
 
+## Workflow Diagram
+
+```mermaid
+flowchart TD
+    subgraph Data Collection
+        A1[ONS Population Data] --> B[data_pipeline.py]
+        A2[ONS Employment Data] --> B
+        A3[HM Land Registry House Prices] --> B
+        A4[DLUHC Housing Completions] --> B
+        A5[ONS/VOA Rental Price Index] --> B
+    end
+
+    subgraph Data Processing
+        B -->|Clean & Merge| C[data/processed/master_dataset.csv]
+        C --> D[Feature Engineering]
+        D -->|Lag Features, Growth Rates, Region Encoding| E[ML-Ready Dataset]
+    end
+
+    subgraph Model Training
+        E --> F[train.py]
+        F --> G1[Linear Regression]
+        F --> G2[Random Forest]
+        F --> G3[Gradient Boosting]
+        G1 -->|MAPE + RMSE Evaluation| H{Best Model Selection}
+        G2 --> H
+        G3 --> H
+        H -->|Winner: LR ~1.8% MAPE| I[models/model.pkl]
+        H --> J[backend/metadata.json]
+    end
+
+    subgraph Backend - FastAPI
+        I --> K[model.py - Prediction Engine]
+        J --> K
+        K --> L[/predict - Single Prediction]
+        K --> M[/compare - Region Comparison]
+        N[analytics.py] --> O[/analytics/timeseries]
+        N --> P[/analytics/outliers]
+        N --> Q[/analytics/correlation]
+        N --> R[/analytics/stats/regions]
+        S[insights.py] --> L
+    end
+
+    subgraph Frontend - React + TypeScript
+        L --> T[Predict Page]
+        M --> U[Compare Page]
+        O & P & Q & R --> V[Analytics Page]
+        W[/model/info] --> X[Home Dashboard]
+        T & U & V & X --> Y[Sidebar Navigation + Layout]
+    end
+
+    subgraph User
+        Y --> Z((User Browser))
+    end
+```
+
+## System Architecture
+
+```mermaid
+flowchart LR
+    subgraph Client
+        Browser[React App :5173]
+    end
+
+    subgraph Server
+        API[FastAPI :8000]
+        Model[model.pkl]
+        CSV[(CSV Data Files)]
+    end
+
+    Browser -->|Axios HTTP Requests| API
+    API -->|Load & Predict| Model
+    API -->|Read| CSV
+    API -->|JSON Response| Browser
+```
+
+## Request Flow
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant Frontend as React Frontend
+    participant API as FastAPI Backend
+    participant Model as ML Model
+    participant Insights as Insight Generator
+
+    User->>Frontend: Select region, indicator, year
+    Frontend->>API: GET /predict?region=...&indicator=...&year=...
+    API->>Model: Load model.pkl & predict
+    Model-->>API: Predicted value + confidence interval
+    API->>Insights: Generate plain-English insight
+    Insights-->>API: Insight text
+    API-->>Frontend: JSON {prediction, confidence, insight}
+    Frontend-->>User: Render chart + insight card
+```
+
 ## Project layout
 
 ```
