@@ -10,54 +10,60 @@ Built with FastAPI (Python) on the backend and React + TypeScript on the fronten
 
 ```mermaid
 flowchart TD
-    subgraph Data Collection
-        A1[ONS Population Data] --> B[data_pipeline.py]
-        A2[ONS Employment Data] --> B
-        A3[HM Land Registry House Prices] --> B
-        A4[DLUHC Housing Completions] --> B
-        A5[ONS/VOA Rental Price Index] --> B
+    subgraph DC["Data Collection"]
+        A1["ONS Population Data"] --> B["data_pipeline.py"]
+        A2["ONS Employment Data"] --> B
+        A3["HM Land Registry House Prices"] --> B
+        A4["DLUHC Housing Completions"] --> B
+        A5["ONS VOA Rental Price Index"] --> B
     end
 
-    subgraph Data Processing
-        B -->|Clean & Merge| C[data/processed/master_dataset.csv]
-        C --> D[Feature Engineering]
-        D -->|Lag Features, Growth Rates, Region Encoding| E[ML-Ready Dataset]
+    subgraph DP["Data Processing"]
+        B -->|"Clean and Merge"| C["master_dataset.csv"]
+        C --> D["Feature Engineering"]
+        D -->|"Lag Features, Growth Rates, Region Encoding"| E["ML-Ready Dataset"]
     end
 
-    subgraph Model Training
-        E --> F[train.py]
-        F --> G1[Linear Regression]
-        F --> G2[Random Forest]
-        F --> G3[Gradient Boosting]
-        G1 -->|MAPE + RMSE Evaluation| H{Best Model Selection}
+    subgraph MT["Model Training"]
+        E --> F["train.py"]
+        F --> G1["Linear Regression"]
+        F --> G2["Random Forest"]
+        F --> G3["Gradient Boosting"]
+        G1 -->|"MAPE and RMSE Evaluation"| H{"Best Model Selection"}
         G2 --> H
         G3 --> H
-        H -->|Winner: LR ~1.8% MAPE| I[models/model.pkl]
-        H --> J[backend/metadata.json]
+        H -->|"Winner: LR 1.8 percent MAPE"| I["models/model.pkl"]
+        H --> J["backend/metadata.json"]
     end
 
-    subgraph Backend - FastAPI
-        I --> K[model.py - Prediction Engine]
+    subgraph BE["Backend FastAPI"]
+        I --> K["model.py Prediction Engine"]
         J --> K
-        K --> L[/predict - Single Prediction]
-        K --> M[/compare - Region Comparison]
-        N[analytics.py] --> O[/analytics/timeseries]
-        N --> P[/analytics/outliers]
-        N --> Q[/analytics/correlation]
-        N --> R[/analytics/stats/regions]
-        S[insights.py] --> L
+        K --> L["Predict Endpoint"]
+        K --> M["Compare Endpoint"]
+        N["analytics.py"] --> O["Timeseries"]
+        N --> P["Outliers"]
+        N --> Q["Correlation"]
+        N --> R["Region Stats"]
+        S["insights.py"] --> L
     end
 
-    subgraph Frontend - React + TypeScript
-        L --> T[Predict Page]
-        M --> U[Compare Page]
-        O & P & Q & R --> V[Analytics Page]
-        W[/model/info] --> X[Home Dashboard]
-        T & U & V & X --> Y[Sidebar Navigation + Layout]
+    subgraph FE["Frontend React TypeScript"]
+        L --> T["Predict Page"]
+        M --> U["Compare Page"]
+        O --> V["Analytics Page"]
+        P --> V
+        Q --> V
+        R --> V
+        W["Model Info"] --> X["Home Dashboard"]
+        T --> Y["Sidebar Navigation and Layout"]
+        U --> Y
+        V --> Y
+        X --> Y
     end
 
-    subgraph User
-        Y --> Z((User Browser))
+    subgraph US["User"]
+        Y --> Z(("User Browser"))
     end
 ```
 
@@ -65,20 +71,20 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    subgraph Client
-        Browser[React App :5173]
+    subgraph Client["Client"]
+        Browser["React App port 5173"]
     end
 
-    subgraph Server
-        API[FastAPI :8000]
-        Model[model.pkl]
-        CSV[(CSV Data Files)]
+    subgraph Server["Server"]
+        API["FastAPI port 8000"]
+        Model["model.pkl"]
+        CSV[("CSV Data Files")]
     end
 
-    Browser -->|Axios HTTP Requests| API
-    API -->|Load & Predict| Model
-    API -->|Read| CSV
-    API -->|JSON Response| Browser
+    Browser -->|"Axios HTTP Requests"| API
+    API -->|"Load and Predict"| Model
+    API -->|"Read"| CSV
+    API -->|"JSON Response"| Browser
 ```
 
 ## Request Flow
@@ -92,9 +98,9 @@ sequenceDiagram
     participant Insights as Insight Generator
 
     User->>Frontend: Select region, indicator, year
-    Frontend->>API: GET /predict?region=...&indicator=...&year=...
-    API->>Model: Load model.pkl & predict
-    Model-->>API: Predicted value + confidence interval
+    Frontend->>API: GET /predict?region=...indicator=...year=...
+    API->>Model: Load model.pkl and predict
+    Model-->>API: Predicted value and confidence interval
     API->>Insights: Generate plain-English insight
     Insights-->>API: Insight text
     API-->>Frontend: JSON {prediction, confidence, insight}
