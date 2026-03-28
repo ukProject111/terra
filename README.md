@@ -1,10 +1,36 @@
 # UK Regional Insight Web App
 
-Predicts socioeconomic indicators (population, employment, housing prices, rentals,
-housing completions) for 9 English regions out to 2035, using ML models trained on
-open government data.
+TerraSight is a full-stack web application that forecasts key socioeconomic indicators across 9 English regions from 2025 to 2035. It leverages machine learning models trained on publicly available UK government data to generate predictions with confidence intervals and plain-English insights.
 
-Built with FastAPI (Python) on the backend and React + TypeScript on the frontend.
+### What It Predicts
+
+| Indicator | Source |
+|-----------|--------|
+| Population Estimates | ONS |
+| Employment Rate (%) | ONS / NOMIS |
+| Average House Price (GBP) | HM Land Registry |
+| Rental Price Index | ONS / VOA |
+| Housing Completions | DLUHC |
+
+### Regions Covered
+
+East Midlands, East of England, London, North East, North West, South East, South West, West Midlands, and Yorkshire and The Humber.
+
+### How It Works
+
+1. **Data Pipeline** — Raw CSV files from UK government sources are cleaned, merged, and standardised into a single master dataset.
+2. **Model Training** — Three models (Linear Regression, Random Forest, Gradient Boosting) are trained and evaluated on MAPE and RMSE. The best performer (Linear Regression with ~1.8% average MAPE) is exported for use by the API.
+3. **Backend API** — A FastAPI server loads the trained model and serves predictions, comparisons, and analytics through REST endpoints.
+4. **Frontend Dashboard** — A React + TypeScript interface (built with Vite) lets users explore predictions, compare regions side by side, and view advanced analytics with interactive charts.
+
+### Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Backend | Python, FastAPI, Uvicorn, scikit-learn, Pandas |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS, Recharts |
+| ML Models | Linear Regression, Random Forest, Gradient Boosting (via scikit-learn and XGBoost) |
+| Data | UK Open Government data (OGL v3.0) |
 
 ## Workflow Diagram
 
